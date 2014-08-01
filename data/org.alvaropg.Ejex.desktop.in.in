@@ -1,0 +1,12 @@
+[Desktop Entry]
+_Name=Photos
+_Comment=Access, organize and share photos
+Exec=@PACKAGE_TARNAME@
+Icon=@PACKAGE_TARNAME@
+DBusActivatable=true
+StartupNotify=true
+Terminal=false
+Type=Application
+OnlyShowIn=GNOME;
+Categories=GNOME;GTK;Utility;Core;
+_Keywords=Photos;Pictures;
