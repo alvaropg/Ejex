@@ -42,15 +42,6 @@ LT_INIT
 
 PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= $GTK_MIN_VERSION])
 
-LIBGD_INIT([
-  gtk-hacks
-  main-icon-view
-  main-view
-  notification
-  static
-  tagged-entry
-])
-
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [the desktop-file-validate program])
 AC_PATH_PROG([DESKTOP_FILE_VALIDATE], [desktop-file-validate], [])
 if test -z "$DESKTOP_FILE_VALIDATE"; then
@@ -61,7 +52,6 @@ AC_CONFIG_FILES([
 Makefile
 data/Makefile
 data/org.alvaropg.Ejex.desktop.in
-libgd/Makefile
 src/Makefile
 po/Makefile.in
 ])
