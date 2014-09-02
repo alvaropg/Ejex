@@ -1,24 +1,28 @@
 bin_PROGRAMS = ejex
 
 ejex_SOURCES = \
+	ejex-application.c \
+	ejex-application.h \
+	ejex-application-window.c \
+	ejex-application-window.h \
 	ejex-main.c \
 	$(NULL)
 
-AM_CPPFLAGS = \
+ejex_CPPFLAGS = \
 	-DPACKAGE_LOCALE_DIR=\""${datadir}/locale"\" \
-	$(GTK_CFLAGS) \
-	-I$(top_srcdir)/libgd \
+	$(AM_CPPFLAGS) \
 	$(NULL)
 
-AM_CFLAGS = \
+ejex_CFLAGS = \
 	$(WARN_CFLAGS) \
+	$(GTK_CFLAGS) \
+	$(AM_CFLAGS) \
 	$(NULL)
 
 ejex_LDFLAGS =
 
 ejex_LDADD = \
 	$(GTK_LIBS) \
-	$(top_builddir)/libgd/libgd.la \
 	$(NULL)
 
 -include $(top_srcdir)/git.mk
