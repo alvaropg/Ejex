@@ -40,7 +40,8 @@ AM_GLIB_GNU_GETTEXT
 
 LT_INIT
 
-PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= $GTK_MIN_VERSION])
+PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= $GTK_MIN_VERSION gupnp-1.0])
+PKG_CHECK_MODULES(GUPNP, [gupnp-1.0 gssdp-1.0])
 
 AC_ARG_VAR([DESKTOP_FILE_VALIDATE], [the desktop-file-validate program])
 AC_PATH_PROG([DESKTOP_FILE_VALIDATE], [desktop-file-validate], [])

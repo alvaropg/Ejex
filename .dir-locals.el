@@ -15,4 +15,9 @@
                                "/usr/include/gdk-pixbuf-2.0"
                                "/usr/include/libpng16"
                                "/usr/include/glib-2.0"
-                               "/usr/lib64/glib-2.0/include")))
+                               "/usr/lib64/glib-2.0/include"
+                               "/usr/include/gupnp-1.0"
+                               "/usr/include/gssdp-1.0"
+                               "/usr/include/libsoup-2.4"
+                               "/usr/include/libxml2"
+                               "/usr/include/uuid")))
