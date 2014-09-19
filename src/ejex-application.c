@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*- */
 /*
  * Ejex - Axis camera browser application for GNOME
  * Copyright © 2014 Álvaro Peña <alvaropg@gmail.com>
@@ -20,12 +21,14 @@
 
 #include "ejex-application.h"
 #include "ejex-application-window.h"
+#include "ejex-discover.h"
 
 static void ejex_application_class_init (EjexApplicationClass *klass);
 static void ejex_application_init       (EjexApplication *obj);
 static void ejex_application_activate   (GApplication *application);
 
 struct _EjexApplicationPrivate {
+	EjexDiscover *discover;
         GtkWidget *window;
         guint32 activation_timestamp;
 };
@@ -47,6 +50,8 @@ ejex_application_init (EjexApplication *obj)
 
         priv->window = NULL;
         priv->activation_timestamp = GDK_CURRENT_TIME;
+
+	priv->discover = ejex_discover_new ();
 }
 
 static void
@@ -61,6 +66,8 @@ ejex_application_activate (GApplication *application)
 
         gtk_window_present_with_time (GTK_WINDOW (priv->window), priv->activation_timestamp);
         priv->activation_timestamp = GDK_CURRENT_TIME;
+
+	ejex_discover_launch_async (priv->discover);
 }
 
 GtkApplication*
