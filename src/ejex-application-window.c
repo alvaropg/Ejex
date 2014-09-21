@@ -1,3 +1,4 @@
+/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*- */
 /*
  * Ejex - Axis camera browser application for GNOME
  * Copyright © 2014 Álvaro Peña <alvaropg@gmail.com>
