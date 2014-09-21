@@ -32,7 +32,7 @@ static void ejex_application_window_class_init (EjexApplicationWindowClass *klas
 static void ejex_application_window_init       (EjexApplicationWindow *self);
 
 struct _EjexApplicationWindowPrivate {
-        gchar *title;
+        GtkWidget *header_bar;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (EjexApplicationWindow, ejex_application_window, GTK_TYPE_APPLICATION_WINDOW);
@@ -45,14 +45,13 @@ ejex_application_window_class_init (EjexApplicationWindowClass *klass)
 static void
 ejex_application_window_init (EjexApplicationWindow *self)
 {
-        GtkWidget *widget;
+        self->priv = ejex_application_window_get_instance_private (self);
 
-        widget = gtk_header_bar_new ();
-        gtk_header_bar_set_title (GTK_HEADER_BAR (widget), "Ejex");
-        gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (widget), TRUE);
-
-        gtk_window_set_titlebar (GTK_WINDOW (self), widget);
-        gtk_widget_show (widget);
+        self->priv->header_bar = gtk_header_bar_new ();
+        gtk_header_bar_set_title (GTK_HEADER_BAR (self->priv->header_bar), _("Ejex"));
+        gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (self->priv->header_bar), TRUE);
+        gtk_window_set_titlebar (GTK_WINDOW (self), self->priv->header_bar);
+        gtk_widget_show (self->priv->header_bar);
 }
 
 GtkWidget*
