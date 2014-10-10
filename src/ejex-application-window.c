@@ -1,4 +1,4 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*- */
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 /*
  * Ejex - Axis camera browser application for GNOME
  * Copyright © 2014 Álvaro Peña <alvaropg@gmail.com>
@@ -33,12 +33,13 @@ static void ejex_application_window_init       (EjexApplicationWindow *self);
 
 struct _EjexApplicationWindowPrivate {
         GtkWidget *header_bar;
+        GtkWidget *stack;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (EjexApplicationWindow, ejex_application_window, GTK_TYPE_APPLICATION_WINDOW);
 
 static void
-ejex_application_window_class_init (EjexApplicationWindowClass *klass)
+ejex_application_window_class_init (__attribute__ ((unused)) EjexApplicationWindowClass *klass)
 {
 }
 
@@ -52,12 +53,16 @@ ejex_application_window_init (EjexApplicationWindow *self)
         gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (self->priv->header_bar), TRUE);
         gtk_window_set_titlebar (GTK_WINDOW (self), self->priv->header_bar);
         gtk_widget_show (self->priv->header_bar);
+
+        self->priv->stack = gtk_stack_new ();
+        gtk_container_add (GTK_CONTAINER (self), self->priv->stack);
+        gtk_widget_show (self->priv->stack);
 }
 
 GtkWidget*
 ejex_application_window_new (GtkApplication *application)
 {
-	return GTK_WIDGET (g_object_new (EJEX_TYPE_APPLICATION_WINDOW,
+        return GTK_WIDGET (g_object_new (EJEX_TYPE_APPLICATION_WINDOW,
                                          "application", application,
                                          "title", _(PACKAGE_NAME),
                                          "width_request", WINDOW_MIN_WIDTH,

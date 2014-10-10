@@ -1,12 +1,16 @@
 bin_PROGRAMS = ejex
 
 ejex_SOURCES = \
-	ejex-discover.c \
-	ejex-discover.h \
 	ejex-application.c \
 	ejex-application.h \
 	ejex-application-window.c \
 	ejex-application-window.h \
+	ejex-camera.c \
+	ejex-camera.h \
+	ejex-camera-widget.c \
+	ejex-camera-widget.h \
+	ejex-discover.c \
+	ejex-discover.h \
 	ejex-main.c \
 	$(NULL)
 

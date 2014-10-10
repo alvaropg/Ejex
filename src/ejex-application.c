@@ -1,4 +1,4 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*- */
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 /*
  * Ejex - Axis camera browser application for GNOME
  * Copyright © 2014 Álvaro Peña <alvaropg@gmail.com>
@@ -21,17 +21,30 @@
 
 #include "ejex-application.h"
 #include "ejex-application-window.h"
+#include "ejex-camera.h"
 #include "ejex-discover.h"
 
 static void ejex_application_class_init (EjexApplicationClass *klass);
-static void ejex_application_init       (EjexApplication *obj);
-static void ejex_application_activate   (GApplication *application);
+static void ejex_application_init       (EjexApplication      *self);
+static void ejex_application_activate   (GApplication         *application);
+
+static void ejex_application_camera_available_cb (EjexCamera *camera, gpointer user_data);
+static void ejex_application_populate_store (EjexApplication *self);
 
 struct _EjexApplicationPrivate {
-	EjexDiscover *discover;
+        EjexDiscover *discover;
         GtkWidget *window;
         guint32 activation_timestamp;
+        GHashTable *camera_hash;
 };
+
+enum {
+        COLUMN_NAME,
+        COLUMN_IP,
+        COLUMN_WIDGET,
+        N_COLUMNS
+};
+
 
 G_DEFINE_TYPE_WITH_CODE (EjexApplication, ejex_application, GTK_TYPE_APPLICATION, G_ADD_PRIVATE (EjexApplication));
 
@@ -44,14 +57,14 @@ ejex_application_class_init (EjexApplicationClass *klass)
 }
 
 static void
-ejex_application_init (EjexApplication *obj)
+ejex_application_init (EjexApplication *self)
 {
-        EjexApplicationPrivate *priv = ejex_application_get_instance_private(obj);
+        EjexApplicationPrivate *priv = ejex_application_get_instance_private(self);
 
         priv->window = NULL;
         priv->activation_timestamp = GDK_CURRENT_TIME;
-
-	priv->discover = ejex_discover_new ();
+        priv->discover = ejex_discover_new ();
+        ejex_application_populate_store (self);
 }
 
 static void
@@ -67,7 +80,32 @@ ejex_application_activate (GApplication *application)
         gtk_window_present_with_time (GTK_WINDOW (priv->window), priv->activation_timestamp);
         priv->activation_timestamp = GDK_CURRENT_TIME;
 
-	ejex_discover_launch_async (priv->discover);
+        /* TODO: implement cancellable pattern  */
+        ejex_discover_launch_async (priv->discover, ejex_application_camera_available_cb, self);
+}
+
+static void
+ejex_application_camera_available_cb (EjexCamera *camera, gpointer user_data)
+{
+        gchar *sn;
+        EjexApplicationPrivate *priv = ejex_application_get_instance_private (EJEX_APPLICATION (user_data));
+
+        sn = ejex_camera_get_sn (camera);
+        if (sn == NULL)
+                g_warning ("Detected a camera without a serial number\n");
+        else
+                if (g_hash_table_insert (priv->camera_hash, sn, camera) == FALSE)
+                        g_info ("Camera %s already detected\n", sn);
+                else
+                        g_message ("Inserted %s\n", sn);
+}
+
+static void
+ejex_application_populate_store (EjexApplication *self)
+{
+        EjexApplicationPrivate *priv = ejex_application_get_instance_private(self);
+
+        priv->camera_hash = g_hash_table_new (g_str_hash, g_str_equal);
 }
 
 GtkApplication*

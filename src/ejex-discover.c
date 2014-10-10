@@ -1,4 +1,4 @@
-/* -*- Mode: C; indent-tabs-mode: t; c-basic-offset: 8; tab-width: 8 -*- */
+/* -*- Mode: C; indent-tabs-mode: nil; c-basic-offset: 8; tab-width: 8 -*- */
 /*
  * Ejex - Axis camera browser application for GNOME
  * Copyright © 2014 Álvaro Peña <alvaropg@gmail.com>
@@ -24,12 +24,20 @@
 
 #include "ejex-discover.h"
 
+#include "ejex-camera.h"
+
+typedef struct _EjexDiscoverAsyncData EjexDiscoverAsyncData;
+
+struct _EjexDiscoverAsyncData {
+        EjexDiscoverCameraAvailableCb c_handler;
+        gpointer user_data;
+};
+
 struct _EjexDiscoverPrivate {
-	GUPnPContext *context;
+        GUPnPContext *context;
 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (EjexDiscover, ejex_discover, G_TYPE_OBJECT)
-
 
 static void
 ejex_discover_class_init(__attribute__ ((unused)) EjexDiscoverClass *klass)
@@ -39,38 +47,47 @@ ejex_discover_class_init(__attribute__ ((unused)) EjexDiscoverClass *klass)
 static void
 ejex_discover_init(EjexDiscover *self)
 {
-	self->priv = ejex_discover_get_instance_private (self);
+        self->priv = ejex_discover_get_instance_private (self);
 
-	self->priv->context = gupnp_context_new (NULL, NULL, 0, NULL);
+        self->priv->context = gupnp_context_new (NULL, NULL, 0, NULL);
 }
 
 static void
-device_proxy_available_cb (__attribute__ ((unused)) GUPnPControlPoint *cp, GUPnPDeviceProxy *proxy,__attribute__ ((unused)) gpointer user_data)
+device_proxy_available_cb (__attribute__ ((unused)) GUPnPControlPoint *cp, GUPnPDeviceProxy *proxy, gpointer user_data)
 {
-	gchar *manufacturer;
+        gchar *manufacturer;
+        EjexCamera *camera;
+        EjexDiscoverAsyncData *async_data;
 
-	manufacturer = gupnp_device_info_get_manufacturer (GUPNP_DEVICE_INFO (proxy));
+        manufacturer = gupnp_device_info_get_manufacturer (GUPNP_DEVICE_INFO (proxy));
 
-	if (strcmp(manufacturer, "AXIS") != 0)
-		return;
+        if (strcmp(manufacturer, "AXIS") != 0)
+                return;
 
-	g_print ("Found: %s\n", gupnp_device_info_get_friendly_name (GUPNP_DEVICE_INFO (proxy)));
+        camera = ejex_camera_new_from_device_info (GUPNP_DEVICE_INFO (proxy));
+        async_data = (EjexDiscoverAsyncData *) user_data;
+        (async_data->c_handler) (camera, async_data->user_data);
 }
 
 EjexDiscover*
 ejex_discover_new (void)
 {
-	return EJEX_DISCOVER (g_object_new (EJEX_TYPE_DISCOVER, NULL));
+        return EJEX_DISCOVER (g_object_new (EJEX_TYPE_DISCOVER, NULL));
 }
 
 void
-ejex_discover_launch_async (EjexDiscover *self)
+ejex_discover_launch_async (EjexDiscover *self, EjexDiscoverCameraAvailableCb c_handler, gpointer user_data)
 {
-	GUPnPControlPoint *cp;
+        GUPnPControlPoint *cp;
+        EjexDiscoverAsyncData *async_data;
 
-	g_return_if_fail (EJEX_IS_DISCOVER (self));
+        g_return_if_fail (EJEX_IS_DISCOVER (self));
 
-	cp = gupnp_control_point_new (self->priv->context, "urn:schemas-upnp-org:device:Basic:1");
-	g_signal_connect (cp, "device-proxy-available", G_CALLBACK (device_proxy_available_cb), NULL);
-	gssdp_resource_browser_set_active (GSSDP_RESOURCE_BROWSER (cp), TRUE);
+        async_data = g_new0(EjexDiscoverAsyncData, 1);
+        async_data->c_handler = c_handler;
+        async_data->user_data = user_data;
+
+        cp = gupnp_control_point_new (self->priv->context, "urn:schemas-upnp-org:device:Basic:1");
+        g_signal_connect (cp, "device-proxy-available", G_CALLBACK (device_proxy_available_cb), async_data);
+        gssdp_resource_browser_set_active (GSSDP_RESOURCE_BROWSER (cp), TRUE);
 }
