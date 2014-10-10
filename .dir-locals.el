@@ -1,6 +1,7 @@
 ((c-mode
   (flycheck-clang-include-path "./"
                                "../"
+                               "../src/"
                                "/usr/include/gtk-3.0"
                                "/usr/include/at-spi2-atk/2.0"
                                "/usr/include/gio-unix-2.0/"
